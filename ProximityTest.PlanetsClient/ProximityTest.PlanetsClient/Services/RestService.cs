@@ -11,15 +11,11 @@ namespace ProximityTest.PlanetsClient.Services
     public class RestService : IRestService
     {
         private string _baseUrl = string.Empty;
-        private HttpClient _httpClient;
 
         public RestService()
         {
-            this._httpClient = new HttpClient();
             this._baseUrl = "http://code-challenge.proximitycr.com";
         }
-
-        public string Token { get; set; }
 
         public async Task<AuthResponse> AuthAsync()
         {
@@ -29,7 +25,8 @@ namespace ProximityTest.PlanetsClient.Services
             jsonObject.Add("email", "aibarralandeo@outlook.com");
             jsonObject.Add("passphrase", "adolfo-ibarra-xamarin");
 
-            var response = await _httpClient.PostAsync($"{_baseUrl}/gimme-the-token", new StringContent(jsonObject.ToString(), Encoding.UTF8, contentType));
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.PostAsync($"{_baseUrl}/gimme-the-token", new StringContent(jsonObject.ToString(), Encoding.UTF8, contentType));
             response.EnsureSuccessStatusCode();
 
             AuthResponse authResponse = await response.Content.ReadAsAsync<AuthResponse>();
@@ -40,7 +37,7 @@ namespace ProximityTest.PlanetsClient.Services
         {
             HttpClient httpClient = new HttpClient();
 
-            httpClient.DefaultRequestHeaders.Add("Authorization", Token);
+            httpClient.DefaultRequestHeaders.Add("Authorization", await GetTokenAsync());
             var response = await httpClient.GetAsync($"{_baseUrl}/planets");
 
             response.EnsureSuccessStatusCode();
@@ -65,7 +62,6 @@ namespace ProximityTest.PlanetsClient.Services
 
         public async Task SetTokenAsync(string token)
         {
-            Token = token;
             await SecureStorage.SetAsync("token", token);
         }
     }

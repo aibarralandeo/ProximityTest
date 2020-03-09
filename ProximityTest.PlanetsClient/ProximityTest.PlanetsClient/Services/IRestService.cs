@@ -8,7 +8,6 @@ namespace ProximityTest.PlanetsClient.Services
 {
     public interface IRestService
     {
-        string Token { get; set; }
         Task<string> GetTokenAsync();
         Task SetTokenAsync(string token);
         Task<AuthResponse> AuthAsync();
